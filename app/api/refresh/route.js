@@ -8,15 +8,28 @@ export async function GET(req) {
     return new Response('Unauthorized', { status: 401 });
   }
   try {
-    const res = await fetch(
+        const res = await fetch(
       process.env.EASYGO_URL || 'https://vtsapi.easygo-gps.co.id/api/report/lastposition',
-            {
+      {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${process.env.EASYGO_TOKEN}`,
+          token: process.env.EASYGO_TOKEN,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({
+          list_vehicle_id: [],
+          list_nopol: [],
+          list_no_aset: [],
+          status_vehicle: null,
+          geo_code: [],
+          min_lastupdate_hour: null,
+          page: 0,
+          encrypted: 0,
+          lat: null,
+          lon: null,
+          sort_by_distance: false,
+          max_distance: null,
+        }),
         cache: 'no-store',
         signal: AbortSignal.timeout(8000),
       }
