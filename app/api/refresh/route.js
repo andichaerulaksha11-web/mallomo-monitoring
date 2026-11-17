@@ -10,9 +10,13 @@ export async function GET(req) {
   try {
     const res = await fetch(
       process.env.EASYGO_URL || 'https://vtsapi.easygo-gps.co.id/api/report/lastposition',
-      {
-        // Sesuaikan jika skema autentikasi EasyGO berbeda (mis. header "token")
-        headers: { Authorization: `Bearer ${process.env.EASYGO_TOKEN}` },
+            {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.EASYGO_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
         cache: 'no-store',
         signal: AbortSignal.timeout(8000),
       }
