@@ -9,7 +9,7 @@ export async function GET(req) {
     return new Response('Unauthorized', { status: 401 });
   }
   try {
-        const res = await fetch(
+    const res = await fetch(
       process.env.EASYGO_URL || 'https://vtsapi.easygo-gps.co.id/api/report/lastposition',
       {
         method: 'POST',
@@ -32,7 +32,7 @@ export async function GET(req) {
           max_distance: null,
         }),
         cache: 'no-store',
-        signal: AbortSignal.timeout(25000)
+        signal: AbortSignal.timeout(25000),
       }
     );
     if (!res.ok) throw new Error(`EasyGO HTTP ${res.status}`);
@@ -56,6 +56,7 @@ export async function GET(req) {
           parkStart: p?.start_time || null,
           addr: p?.addr || u.addr,
           geo: p?.geo_location_nm || '',
+          geoCode: p?.geo_location_code || p?.geo_location_nm || '',
         };
       });
 

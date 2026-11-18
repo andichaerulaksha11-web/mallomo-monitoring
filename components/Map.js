@@ -6,12 +6,12 @@ import { STATES, fmt } from '../lib/units';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-export default function MapView({ units, selected }) {
+export default function MapView({ units, selected, fitKey }) {
   const el = useRef(null);
   const map = useRef(null);
   const layer = useRef(null);
   const markers = useRef({});
-  const fitted = useRef(false);
+  const lastFit = useRef(null);
   const flown = useRef(null);
 
   useEffect(() => {
@@ -27,9 +27,12 @@ export default function MapView({ units, selected }) {
   useEffect(() => {
     layer.current.clearLayers();
     markers.current = {};
+    const over = [];
     units.forEach((u) => {
+      const isOver = u.state === 'overtime';
       const m = L.circleMarker([u.lat, u.lon], {
-        radius: 8, color: '#fff', weight: 2, fillColor: u.color, fillOpacity: 1,
+        radius: isOver ? 10 : 8, color: '#fff', weight: 2, fillColor: u.color, fillOpacity: 1,
+        className: isOver ? 'blink' : '',
       }).bindPopup(
         `<b>${esc(u.nopol)}</b><br>${esc(u.company)} · ${esc(u.group)}<br>` +
         `Status: ${STATES[u.state].label}` +
@@ -38,17 +41,21 @@ export default function MapView({ units, selected }) {
       );
       m.addTo(layer.current);
       markers.current[u.nopol] = m;
+      if (isOver) over.push(m);
     });
-    if (!fitted.current && units.length && !selected) {
+    over.forEach((m) => m.bringToFront()); // unit merah selalu di atas
+
+    // Zoom ulang tiap kali pencarian/filter status berubah
+    if (fitKey !== lastFit.current && units.length && !selected) {
       map.current.fitBounds(L.latLngBounds(units.map((u) => [u.lat, u.lon])), { padding: [40, 40], maxZoom: 14 });
-      fitted.current = true;
+      lastFit.current = fitKey;
     }
     const m = selected && markers.current[selected];
     if (m) {
-      if (flown.current !== selected) { map.current.flyTo(m.getLatLng(), 16); flown.current = selected; fitted.current = true; }
+      if (flown.current !== selected) { map.current.flyTo(m.getLatLng(), 16); flown.current = selected; lastFit.current = fitKey; }
       m.openPopup();
     }
-  }, [units, selected]);
+  }, [units, selected, fitKey]);
 
   return <div ref={el} style={{ height: '100%', width: '100%' }} />;
 }
