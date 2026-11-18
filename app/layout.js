@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
           <Nav />
         </header>
         <main>{children}</main>
-        <footer className="bar">Data: EasyGO GPS · Diperbarui otomatis tiap 1 menit</footer>
+        <footer className="bar">© 2026 PT Mallomo. All Right Reserved</footer>
       </body>
     </html>
   );
