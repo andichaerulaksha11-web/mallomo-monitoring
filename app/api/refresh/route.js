@@ -32,7 +32,7 @@ export async function GET(req) {
           max_distance: null,
         }),
         cache: 'no-store',
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(25000)
       }
     );
     if (!res.ok) throw new Error(`EasyGO HTTP ${res.status}`);
