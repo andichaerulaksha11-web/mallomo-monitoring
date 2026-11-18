@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useUnits } from '../lib/useUnits';
 import { enrich, STATES, lastUpdate } from '../lib/units';
+import SearchBox from '../components/SearchBox';
 
 const MapView = dynamic(() => import('../components/Map'), { ssr: false });
 
@@ -10,7 +11,8 @@ export default function Tracking() {
   const { data, error, now, stale } = useUnits();
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(null);
-  const [active, setActive] = useState([]); // status yang dipilih; kosong = semua
+  const [active, setActive] = useState([]); // filter status; kosong = semua
+  const [groups, setGroups] = useState([]); // filter jenis unit (group_nm); kosong = semua
 
   // Dari tombol "Track": /?track=NOPOL
   useEffect(() => {
@@ -18,38 +20,58 @@ export default function Tracking() {
     if (t) { setQuery(t); setSelected(t); }
   }, []);
 
-  const searched = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return enrich(data?.units || [], now).filter(
-      (u) => !q || [u.nopol, u.company, u.group].some((v) => String(v || '').toLowerCase().includes(q))
-    );
-  }, [data, now, query]);
+  const all = useMemo(() => enrich(data?.units || [], now), [data, now]);
 
-  const counts = useMemo(() => {
+  const byQuery = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return all.filter((u) => !q || [u.nopol, u.company, u.group].some((v) => String(v || '').toLowerCase().includes(q)));
+  }, [all, query]);
+
+  // Jumlah di tombol status mengikuti pencarian + jenis unit
+  const statusCounts = useMemo(() => {
     const c = {};
-    searched.forEach((u) => { c[u.state] = (c[u.state] || 0) + 1; });
+    byQuery.forEach((u) => {
+      if (!groups.length || groups.includes(u.group || '')) c[u.state] = (c[u.state] || 0) + 1;
+    });
     return c;
-  }, [searched]);
+  }, [byQuery, groups]);
+
+  // Jumlah per jenis unit mengikuti pencarian + status
+  const groupList = useMemo(() => {
+    const c = {};
+    all.forEach((u) => { c[u.group || ''] = 0; });
+    byQuery.forEach((u) => {
+      if (!active.length || active.includes(u.state)) c[u.group || '']++;
+    });
+    return Object.entries(c)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, count]) => ({ name, count }));
+  }, [all, byQuery, active]);
 
   const units = useMemo(
-    () => (active.length ? searched.filter((u) => active.includes(u.state)) : searched),
-    [searched, active]
+    () => byQuery.filter((u) => (!groups.length || groups.includes(u.group || '')) && (!active.length || active.includes(u.state))),
+    [byQuery, groups, active]
   );
 
-  const toggle = (k) => {
+  const toggleStatus = (k) => {
     setActive((a) => (a.includes(k) ? a.filter((x) => x !== k) : [...a, k]));
+    setSelected(null);
+  };
+  const toggleGroup = (g) => {
+    setGroups((a) => (a.includes(g) ? a.filter((x) => x !== g) : [...a, g]));
     setSelected(null);
   };
 
   return (
     <>
       <div className="tools">
-        <input
-          type="search"
-          placeholder="Cari nopol, perusahaan, atau grup"
-          aria-label="Cari unit"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
+        <SearchBox
+          query={query}
+          onQuery={(v) => { setQuery(v); setSelected(null); }}
+          groups={groupList}
+          selected={groups}
+          onToggle={toggleGroup}
+          onClear={() => { setGroups([]); setSelected(null); }}
         />
         <div className="legend">
           {Object.entries(STATES).map(([k, s]) => (
@@ -58,14 +80,14 @@ export default function Tracking() {
               type="button"
               className={'chip' + (active.includes(k) ? ' on' : '')}
               aria-pressed={active.includes(k)}
-              onClick={() => toggle(k)}
+              onClick={() => toggleStatus(k)}
             >
               <span className={'dot' + (k === 'overtime' ? ' blink' : '')} style={{ background: s.color }} />
-              {s.label} ({counts[k] || 0})
+              {s.label} ({statusCounts[k] || 0})
             </button>
           ))}
-          {active.length > 0 && (
-            <button type="button" className="chip" onClick={() => { setActive([]); setSelected(null); }}>
+          {(active.length > 0 || groups.length > 0) && (
+            <button type="button" className="chip" onClick={() => { setActive([]); setGroups([]); setSelected(null); }}>
               Tampilkan semua
             </button>
           )}
@@ -78,7 +100,11 @@ export default function Tracking() {
         </div>
       )}
       <div className="mapbox">
-        <MapView units={units} selected={selected} fitKey={query + '|' + [...active].sort().join(',')} />
+        <MapView
+          units={units}
+          selected={selected}
+          fitKey={query + '|' + [...active].sort().join(',') + '|' + [...groups].sort().join(',')}
+        />
       </div>
     </>
   );

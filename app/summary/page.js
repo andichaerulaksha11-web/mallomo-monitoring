@@ -2,10 +2,11 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useUnits } from '../../lib/useUnits';
-import { enrich, fmt, timeId } from '../../lib/units';
+import { enrich, fmt, lastUpdate } from '../../lib/units';
 
-export default function Summary() {
+export default function ListUnitParkir() {
   const { data, error, now, stale } = useUnits();
+  // Hanya unit parkir > 2 jam (status merah)
   const list = useMemo(
     () => enrich(data?.units || [], now).filter((u) => u.state === 'overtime').sort((a, b) => b.parkSec - a.parkSec),
     [data, now]
@@ -13,9 +14,9 @@ export default function Summary() {
 
   return (
     <div className="page">
-      <h1>Executive Summary</h1>
+      <h1>List Unit Parkir</h1>
       <div>
-        <b>{list.length}</b> unit parkir lebih dari 2 jam · update {timeId(data?.updatedAt)}
+        <b>{list.length}</b> unit parkir lebih dari 2 jam · {lastUpdate(data?.updatedAt)}
       </div>
       {(stale || error) && (
         <div className="warn" role="alert" style={{ marginTop: 12 }}>

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Nav from '../components/Nav';
 import './globals.css';
 
 export const metadata = { title: 'Monitoring Parkir Unit | PT. Mallomo' };
@@ -9,13 +9,10 @@ export default function RootLayout({ children }) {
       <body>
         <header className="bar">
           <strong>Monitoring Parkir Unit · PT. Mallomo</strong>
-          <nav>
-            <Link href="/">Real-time Tracking</Link>
-            <Link href="/summary">Executive Summary</Link>
-          </nav>
+          <Nav />
         </header>
         <main>{children}</main>
-        <footer className="bar">© 2026 PT. Mallomo. All Right Reserved</footer>
+        <footer className="bar">Data: EasyGO GPS · Diperbarui otomatis tiap 1 menit</footer>
       </body>
     </html>
   );

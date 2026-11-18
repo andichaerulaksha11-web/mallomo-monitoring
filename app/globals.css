@@ -1,21 +1,40 @@
+:root { --hl: #D9252A; }
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; }
 body { display: flex; flex-direction: column; min-height: 100vh; background: #fff; color: #1f2937; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
 .bar { background: #204685; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 footer.bar { font-size: 13px; justify-content: center; }
-nav { display: flex; gap: 20px; }
-nav a { color: #fff; text-decoration: none; padding-bottom: 2px; border-bottom: 2px solid transparent; }
-nav a:hover, nav a:focus-visible { border-bottom-color: #fff; outline: none; }
+nav { display: flex; gap: 10px; flex-wrap: wrap; }
+.navbtn { color: #fff; text-decoration: none; padding: 7px 16px; border: 1px solid rgba(255,255,255,.7); border-radius: 6px; font-size: 14px; }
+.navbtn:hover, .navbtn.on { background: var(--hl); border-color: var(--hl); }
+.navbtn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .tools { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 10px 20px; border-bottom: 1px solid #e5e7eb; }
-.tools input { padding: 8px 12px; width: min(320px, 100%); border: 1px solid #9ca3af; border-radius: 6px; font-size: 14px; }
-.tools input:focus-visible { outline: 2px solid #204685; }
+
+.search { position: relative; width: min(340px, 100%); }
+.search > input { width: 100%; padding: 8px 64px 8px 12px; border: 1px solid #9ca3af; border-radius: 6px; font-size: 14px; }
+.search > input:focus-visible { outline: 2px solid #204685; }
+.sbtn { position: absolute; top: 4px; right: 4px; bottom: 4px; display: flex; align-items: center; gap: 6px; padding: 0 9px; border: 0; border-radius: 4px; background: transparent; color: #374151; cursor: pointer; }
+.sbtn:hover, .sbtn.on { background: var(--hl); color: #fff; }
+.sbtn:focus-visible { outline: 2px solid #204685; }
+.badge { background: var(--hl); color: #fff; border-radius: 999px; font-size: 11px; min-width: 18px; height: 18px; line-height: 18px; text-align: center; }
+.sbtn:hover .badge, .sbtn.on .badge { background: #fff; color: var(--hl); }
+.panel { position: absolute; z-index: 2000; top: calc(100% + 4px); left: 0; min-width: 100%; width: max-content; max-width: 90vw; max-height: 320px; overflow-y: auto; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.15); }
+.panelhead { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+.link { border: 0; background: none; color: var(--hl); font: inherit; cursor: pointer; padding: 0; }
+.link:hover { text-decoration: underline; }
+.row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 14px; cursor: pointer; }
+.row:hover { background: #f3f4f6; }
+.row input { accent-color: var(--hl); width: 16px; height: 16px; }
+.none { padding: 12px; font-size: 13px; color: #4b5563; }
+
 .legend { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { display: inline-flex; align-items: center; padding: 5px 12px; border: 1px solid #d1d5db; border-radius: 999px; background: #fff; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
-.chip:hover { background: #f3f4f6; }
-.chip.on { border-color: #204685; background: #e8eef8; font-weight: 600; }
+.chip:hover, .chip.on { background: var(--hl); border-color: var(--hl); color: #fff; }
+.chip.on { font-weight: 600; }
 .chip:focus-visible { outline: 2px solid #204685; outline-offset: 2px; }
 .dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; }
+.chip:hover .dot, .chip.on .dot { box-shadow: 0 0 0 2px #fff; }
 .meta { margin-left: auto; font-size: 13px; color: #4b5563; }
 .warn { background: #fef2f2; color: #991b1b; padding: 8px 20px; font-size: 14px; }
 .mapbox { flex: 1; min-height: 480px; position: relative; }
@@ -31,5 +50,5 @@ th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e5e7eb;
 th { background: #f3f4f6; color: #204685; }
 .dur { color: #dc2626; font-weight: 600; white-space: nowrap; }
 .btn { display: inline-block; background: #204685; color: #fff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; }
-.btn:hover, .btn:focus-visible { background: #173366; }
+.btn:hover, .btn:focus-visible { background: var(--hl); }
 .empty { padding: 32px 0; color: #4b5563; }
