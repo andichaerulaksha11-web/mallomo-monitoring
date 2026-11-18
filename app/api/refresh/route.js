@@ -1,6 +1,7 @@
 import { redis, KEY } from '../../../lib/redis';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 // Dipanggil cron-job.org tiap 1 menit
 export async function GET(req) {
